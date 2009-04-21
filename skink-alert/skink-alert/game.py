@@ -25,18 +25,21 @@ from pygame.locals import *
 RESOLUTION_VERTICAL=400
 RESOLUTION_HORIZONTAL=400
 FULL_SCREEN_MODE = False
-DEBUG_MODE = True
+DEBUG_MODE = False
+
+RED_BG = (227,52,52)
+GREEN_BG = (11,143,1)
+YELLOW_BG = (255, 248, 135)
+
+BLACK_TEXT = (0,0,0)
+WHITE_TEXT = (255,255,255)
 
 class Game(object):
 
     def __init__(self):
         self.initialize()
         self.resources = Resources()
-        self.preload_resources()
-
-    def preload_resources(self):
-        self.resources.load_broken_build_sound()
-        self.resources.load_logo_image()
+        self.resources.preload()
 
     def log(self, message):
         if DEBUG_MODE:
@@ -52,12 +55,13 @@ class Game(object):
             self.window = pygame.display.set_mode((RESOLUTION_VERTICAL,RESOLUTION_HORIZONTAL))
         pygame.display.set_caption('Skink Alert')
         self.screen = pygame.display.get_surface()
-        self.resources.print_logo_image(self.screen)
+        self.display_message("Retrieving...", YELLOW_BG, BLACK_TEXT)
 
     def loop(self):
+        event_handler = EventHandler(self)
         while True:
             try:
-                return_value = self.process_events(pygame.event.get())
+                return_value = event_handler.process_events(pygame.event.get())
                 if not return_value:
                     continue
                 if return_value == "QUIT":
@@ -69,14 +73,29 @@ class Game(object):
                 print "Exiting due to exit signal..."
                 return 0
 
+    def display_message(self, message, rgb = GREEN_BG, text_color=WHITE_TEXT):
+        self.resources.print_bg(rgb, self.screen)
+        self.resources.print_message(message, text_color, self.screen)
+        self.resources.print_logo_image(self.screen)
+        pygame.display.update()
+
+class EventHandler(object):
+    def __init__(self, game):
+        self.game = game
+
     def process_events(self, events):
         if not events: return None
-        
+
         for event in events:
             if self.check_for_quit(event):
                 return "QUIT"
             if self.check_for_sound(event):
                 self.resources.play_broken_build_sound()
+            if event.type == KEYDOWN:
+                if event.unicode == 'r':
+                    self.game.display_message("FAIL", RED_BG)
+                if event.unicode == 'g':
+                    self.game.display_message("SUCCESS", GREEN_BG)
             return event
 
     def check_for_quit(self, event):
@@ -94,6 +113,10 @@ class Game(object):
         return False
 
 class Resources(object):
+    def preload(self):
+        self.load_broken_build_sound()
+        self.load_logo_image()
+
     def play_broken_build_sound(self):
         sound = self.load_broken_build_sound()
         sound.play()
@@ -104,7 +127,7 @@ class Resources(object):
 
         if not pygame.mixer:
             return NoneSound()
-        fullname = join(root_path, "skink-alert", "doh.wav")
+        fullname = join(root_path, "skink-alert", "brain.wav")
         try:
             sound = pygame.mixer.Sound(fullname)
         except pygame.error, message:
@@ -129,3 +152,24 @@ class Resources(object):
         screen.blit(self.logo_surface, (pos_x,0))
         pygame.display.update()
 
+    def print_message(self, message, text_color, screen):
+        if pygame.font:
+            font = pygame.font.Font(None, 72)
+            text = font.render(message, 1, text_color)
+            text_position = text.get_rect()
+            text_width = text_position.width
+            text_height = text_position.height
+
+            display_info = pygame.display.Info()
+            screen_width = display_info.current_w
+            screen_height = display_info.current_h
+
+            pos_x = (screen_width / 2) - text_width/2
+            pos_y = (screen_height / 2) - text_height/2
+            screen.blit(text, (pos_x,pos_y))
+
+    def print_bg(self, rgb, screen):
+        background = pygame.Surface(screen.get_size())
+        background = background.convert()
+        background.fill(rgb)
+        screen.blit(background, (0,0))

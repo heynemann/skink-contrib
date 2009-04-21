@@ -21,8 +21,7 @@ def main():
     print "Initializing pygame..."
     game = Game()
     game.show()
-    game.loop()
-    return 0
+    return game.loop()
 
 if __name__ == '__main__':
     sys.exit(main())
