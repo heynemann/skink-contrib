@@ -49,19 +49,20 @@ class Game(object):
         pygame.init()
 
     def show(self):
-        if self.ctx.debug_mode:
-            vert_res=400
+        if self.ctx.debug_mode or not self.ctx.full_screen:
+            vert_res=800
             horiz_res=800
             full_screen = False
         else:
             vert_res = self.ctx.height
             horiz_res = self.ctx.width
-            full_screen = self.ctx.full_screen
-
+        
         if full_screen:
+            print "Showing in full screen mode"
             self.window = pygame.display.set_mode((horiz_res, vert_res), pygame.FULLSCREEN)
         else:
-            self.window = pygame.display.set_mode((horiz_res, vert_res))
+            print "Showing in windowed mode"
+            self.window = pygame.display.set_mode((horiz_res, vert_res), 0)
             
         pygame.display.set_caption('Skink Alert')
         self.screen = pygame.display.get_surface()
