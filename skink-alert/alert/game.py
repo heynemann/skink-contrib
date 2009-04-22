@@ -22,7 +22,7 @@ import random
 from threading import Thread
 import httplib
 
-import simplejson
+import demjson
 import pygame
 from pygame.locals import *
 
@@ -229,14 +229,13 @@ class Monitor(object):
             conn.request("GET", url)
             r1 = conn.getresponse()
             json = r1.read()
-            json = json.decode( 'utf-8', 'replace')
+            json = json.decode('utf-8','replace')
         except Exception, message:
             #intentionally swallow since it does not matter why the connection was refused.
             cls.is_retrieving = False
             return
 
-        json = force_unicode(json.replace("'","\""))
-        json_object = simplejson.loads(json)
+        json_object = demjson.decode(json)
         if cls.callback:
             cls.callback(json_object)
 
