@@ -73,6 +73,7 @@ class Game(object):
             try:
                 Monitor.get_last_status(self.process_response)
                 return_value = event_handler.process_events(pygame.event.get())
+                time.sleep(1)
                 if not return_value:
                     continue
                 if return_value == "QUIT":
