@@ -30,7 +30,7 @@ class AlertContext:
 
             #General
             cls.instance.debug_mode = config.get("General", "debug_mode").lower() == "true"
-            cls.instance.full_screen = config.get("General", "full_screen")
+            cls.instance.full_screen = config.get("General", "full_screen").lower() == "true"
             cls.instance.width = int(config.get("General", "width"))
             cls.instance.height = int(config.get("General", "height"))
             cls.exit_key = config.get("General","exit_key")
