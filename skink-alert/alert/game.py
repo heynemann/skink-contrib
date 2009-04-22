@@ -56,6 +56,7 @@ class Game(object):
         else:
             vert_res = self.ctx.height
             horiz_res = self.ctx.width
+            full_screen = True
         
         if full_screen:
             print "Showing in full screen mode"
