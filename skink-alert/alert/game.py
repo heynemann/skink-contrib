@@ -225,7 +225,7 @@ class Monitor(object):
             cls.is_retrieving = True
             time.sleep(3)
             conn = httplib.HTTPConnection(ctx.skink_address)
-            url = "/status?_=%.0f" % (random.random() * 1000)
+            url = "/status?_=%d" % random.randint(1,10000000)
             conn.request("GET", url)
             r1 = conn.getresponse()
             json = r1.read()
