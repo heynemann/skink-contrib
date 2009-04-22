@@ -23,17 +23,17 @@ from threading import Thread
 import httplib
 
 import simplejson
-
 import pygame
 from pygame.locals import *
-from text_rect import *
-from context import AlertContext
+
+from alert.text_rect import render_textrect
+from alert.context import AlertContext
+from alert.common import force_unicode
 
 LOGO_HEIGHT = 136
 MESSAGE_OFFSET_VERT = 60
 
 class Game(object):
-
     def __init__(self):
         self.initialize()
         self.ctx = AlertContext.current()
@@ -163,7 +163,7 @@ class Resources(object):
         return sound
 
     def load_logo_image(self):
-        logo_surface_path = join(root_path, "skink-alert", "logo.bmp")
+        logo_surface_path = join(root_path, "alert", "logo.bmp")
         self.logo_surface = pygame.image.load(logo_surface_path)
 
     def print_logo_image(self, screen):
@@ -229,12 +229,13 @@ class Monitor(object):
             conn.request("GET", url)
             r1 = conn.getresponse()
             json = r1.read()
+            json = json.decode( 'utf-8', 'replace')
         except Exception, message:
             #intentionally swallow since it does not matter why the connection was refused.
             cls.is_retrieving = False
             return
 
-        json = json.replace("'","\"")
+        json = force_unicode(json.replace("'","\""))
         json_object = simplejson.loads(json)
         if cls.callback:
             cls.callback(json_object)
