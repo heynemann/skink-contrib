@@ -119,6 +119,7 @@ class Game(object):
         self.resources.print_bg(rgb, self.screen)
         self.resources.print_message(message, text_color, rgb, self.screen)
         self.resources.print_logo_image(self.screen)
+        self.resources.print_exit_message(text_color, rgb, self.screen)
         pygame.display.flip()
 
 class EventHandler(object):
@@ -205,7 +206,17 @@ class Resources(object):
         background = background.convert()
         background.fill(rgb)
         screen.blit(background, (0,0))
-        
+
+    def print_exit_message(self, text_color, background_color, screen):
+        font = pygame.font.Font(None, TEXT_SIZE)
+        display_info = pygame.display.Info()
+        screen_width = display_info.current_w
+        screen_height = display_info.current_h
+        rect = pygame.Rect((0, screen_height - 30, screen_width, 30))
+        rendered_text = render_textrect("Press q to QUIT", font, rect, text_color, background_color, 1)
+        if rendered_text:
+            screen.blit(rendered_text, rect.topleft)
+
 class Monitor(object):
     is_retrieving = False
 
